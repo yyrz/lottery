@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Title</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.1/echarts.min.js"></script>
+</head>
+
+<body>
+<div id="main" style="width: 2300px;height:4200px;"></div>
+
+
+<script th:inline="none" type="text/javascript">
+
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "/api/kuaileba/punchCard", true);
+	xhr.setRequestHeader('Content-Type', 'application/json')
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState === 4 && xhr.status === 200) {
+			var obj = JSON.parse(xhr.responseText)
+			console.log(obj)
+			create(obj.data);
+		}
+	};
+	xhr.send();
+
+
+	function create(result){
+		var chartDom = document.getElementById('main');
+		var myChart = echarts.init(chartDom);
+		var option;
+
+		// prettier-ignore
+		const hours = [];
+		for (let i = 1; i <= 80; i++) {
+			hours.push(i)
+		}
+		// prettier-ignore
+		const days = [
+		];
+		// prettier-ignore
+		const data = result.data
+
+
+		option = {
+			tooltip: {
+				position: 'top'
+			},
+			grid: {
+				height: '50%',
+				top: '10%'
+			},
+			xAxis: {
+				type: 'category',
+				data: hours,
+				splitArea: {
+					show: true
+				}
+			},
+			yAxis: {
+				type: 'category',
+				data: result.col,
+				splitArea: {
+					show: true
+				}
+			},
+			visualMap: {
+				min: 1,
+				max: 40,
+				calculable: true,
+				orient: 'horizontal',
+				left: 'center',
+				bottom: '15%'
+			},
+			series: [
+				{
+					name: 'Punch Card',
+					type: 'heatmap',
+					data: data,
+					label: {
+						show: true
+					},
+					emphasis: {
+						itemStyle: {
+							shadowBlur: 10,
+							shadowColor: 'rgba(0, 0, 0, 0.5)'
+						}
+					}
+				}
+			]
+		};
+
+		option && myChart.setOption(option);
+	}
+
+</script>
+</body>
+</html>
